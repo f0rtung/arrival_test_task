@@ -61,6 +61,14 @@ namespace balancer {
         msg_t read_message()
         {
             proto::bytes bytes(msg_t::message_length());
+            std::size_t readed_bytes{0};
+            while(readed_bytes < bytes.size()) {
+                proto::byte *start_write_pos{bytes.data() + readed_bytes};
+                const std::size_t expected_read{bytes.size() - readed_bytes};
+                readed_bytes += bufferevent_read(client_buffer_.get(),
+                                                 start_write_pos,
+                                                 expected_read);
+            }
             bufferevent_read(client_buffer_.get(), bytes.data(), bytes.size());
             msg_t msg{std::move(bytes)};
             msg.load();
