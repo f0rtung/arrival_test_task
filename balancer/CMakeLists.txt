@@ -30,6 +30,7 @@ file(GLOB SRC_LIST
     ./src/tcp-server/*.h
     ./src/tcp-server/*.cpp
     ./src/tcp-session/*.h
+    ./src/tcp-session/*.cpp
 )
 
 set(MODULE_NAME ${PROJECT_NAME})
