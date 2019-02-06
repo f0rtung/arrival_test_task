@@ -15,8 +15,8 @@ namespace proto {
         : type_{type}
     { }
 
-    base_message::base_message(const bytes &data)
-        : data_{data}
+    base_message::base_message(bytes data)
+        : data_{std::move(data)}
         , read_pos_{std::next(data_.cbegin(), static_cast<bytes::difference_type>(prefix.size()))}
     { }
 

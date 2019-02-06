@@ -19,7 +19,7 @@ namespace proto {
 
     public:
         explicit regular_message(payload_t payload);
-        explicit regular_message(const bytes &data);
+        explicit regular_message(bytes data);
         regular_message(regular_message &&rhs) = default;
 
     public:

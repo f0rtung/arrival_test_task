@@ -7,8 +7,8 @@ namespace proto {
         , client_id_{client_id}
     { }
 
-    init_message::init_message(const bytes &data)
-        : base_message(data)
+    init_message::init_message(bytes data)
+        : base_message(std::move(data))
     { }
 
     std::size_t init_message::message_length() noexcept

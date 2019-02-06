@@ -52,6 +52,6 @@ TEST(base_message, LoadFromStream)
 TEST(base_message, LoadFromInvalidStream)
 {
     bytes bytes{1,2,3,4};
-    base_message msg{bytes};
+    base_message msg{std::move(bytes)};
     EXPECT_THROW(msg.load(), std::runtime_error);
 }

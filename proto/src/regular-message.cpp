@@ -9,8 +9,8 @@ namespace proto {
         , payload_{payload}
     { }
 
-    regular_message::regular_message(const bytes &data)
-        : base_message(data)
+    regular_message::regular_message(bytes data)
+        : base_message(std::move(data))
     { }
 
     std::size_t regular_message::message_length() noexcept

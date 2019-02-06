@@ -23,7 +23,7 @@ namespace proto {
     class base_message {
     public:
         explicit base_message(message_type type);
-        explicit base_message(const bytes &data);
+        explicit base_message(bytes data);
         base_message(base_message &&rhs) = default;
 
     public:

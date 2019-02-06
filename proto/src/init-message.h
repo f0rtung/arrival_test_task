@@ -19,7 +19,7 @@ namespace proto {
 
     public:
         explicit init_message(client_id_t clietn_id);
-        explicit init_message(const bytes &data);
+        explicit init_message(bytes data);
         init_message(init_message &&rhs) = default;
 
     public:

@@ -21,7 +21,7 @@ TEST(regular_message, SaveToAndLoadFromStream)
 
 TEST(regular_message, LoadFromInvalidStream)
 {
-    const bytes data(base_message::message_length() + 1);
-    regular_message msg{data};
+    bytes data(base_message::message_length() + 1);
+    regular_message msg{std::move(data)};
     EXPECT_THROW(msg.load(), std::runtime_error);
 }
