@@ -1,6 +1,7 @@
 #include "utils.h"
 
 #include <cstring>
+#include <log4cplus/consoleappender.h>
 
 namespace {
 
@@ -35,6 +36,14 @@ namespace common {
         sockaddr_in sin{make_sockaddr_with_port(port)};
         inet_pton(AF_INET, host.c_str(), &sin.sin_addr.s_addr);
         return sin;
+    }
+
+    log4cplus::Logger make_logger(const std::string &logger_name)
+    {
+        log4cplus::Logger logger{log4cplus::Logger::getInstance(LOG4CPLUS_TEXT(logger_name))};
+        log4cplus::SharedAppenderPtr consoleAppender(new log4cplus::ConsoleAppender(false, true));
+        logger.addAppender(consoleAppender);
+        return logger;
     }
 
 }

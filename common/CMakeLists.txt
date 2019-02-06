@@ -21,3 +21,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${OUTPUT_PATH})
 set(MODULE_NAME ${PROJECT_NAME})
 
 add_library(${MODULE_NAME} STATIC ${SRC_LIST})
+
+target_link_libraries(
+    ${PROJECT_NAME}
+    log4cplus
+)

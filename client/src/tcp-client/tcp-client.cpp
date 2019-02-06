@@ -5,12 +5,13 @@
 
 #include <chrono>
 #include <thread>
+#include <log4cplus/loggingmacros.h>
 
 namespace tcp_client {
 
     tcp_client::tcp_client(std::uint32_t client_id, const std::string &host,
                            std::uint16_t port, std::uint32_t max_msg_count)
-        : logger_{"tcp_client"}
+        : logger_{common::make_logger("tcp_client")}
         , client_id_{client_id}
         , r_server_{host, port}
         , max_msg_count_{max_msg_count}
@@ -18,8 +19,8 @@ namespace tcp_client {
 
     void tcp_client::start()
     {
-        logger_.info("Start client with id: ", client_id_,
-                     ". Try to send messages to server: ", r_server_);
+        LOG4CPLUS_INFO(logger_, "Start client with id: " << client_id_
+                       << ". Try to send messages to server: " << r_server_);
 
         eb_ = common::event_base_ptr(event_base_new());
         check_null(eb_, "Can not create new event_base");
@@ -83,13 +84,14 @@ namespace tcp_client {
     {
         if(curr_msg_number_++ < max_msg_count_) {
             const auto regular_msg{proto::make_regular_message()};
-            logger_.info("Send next message: ", curr_msg_number_, " with payload: ", regular_msg.payload());
+            LOG4CPLUS_INFO(logger_, "Send next message: " << curr_msg_number_
+                           << " with payload: " << regular_msg.payload());
             write_message(regular_msg.as_bytes());
             using namespace std::chrono_literals;
             std::this_thread::sleep_for(1s);
         } else {
             if(is_server_finished_read()) {
-                logger_.info("Last message was sent");
+                LOG4CPLUS_INFO(logger_, "Last message was sent");
                 stop();
             }
         }
@@ -98,11 +100,11 @@ namespace tcp_client {
     void tcp_client::on_next_event(short what)
     {
         if(what & BEV_EVENT_ERROR) {
-            logger_.error("Some error from bufferevent. Stop client");
+            LOG4CPLUS_ERROR(logger_, "Some error from bufferevent. Stop client");
             stop();
         }
         if(what & BEV_EVENT_CONNECTED) {
-            logger_.info("Connected to server: ", r_server_);
+            LOG4CPLUS_INFO(logger_, "Connected to server: " << r_server_);
         }
     }
 
@@ -121,7 +123,7 @@ namespace tcp_client {
 
     void tcp_client::log_error_stop_and_throw (const std::string &error_msg)
     {
-        logger_.error(error_msg);
+        LOG4CPLUS_ERROR(logger_, error_msg);
         stop();
         throw std::runtime_error{error_msg};
     }

@@ -2,7 +2,6 @@
 
 #include <common/src/types.h>
 #include <common/src/remote-server.h>
-#include <logger/src/logger.h>
 #include <proto/src/base-message.h>
 
 struct bufferevent;
@@ -34,7 +33,7 @@ namespace tcp_client {
         void log_error_stop_and_throw(const std::string &error_msg);
 
     private:
-        logger::logger logger_;
+        log4cplus::Logger logger_;
         const std::uint32_t client_id_;
         const common::remote_server r_server_;
         const std::uint32_t max_msg_count_;

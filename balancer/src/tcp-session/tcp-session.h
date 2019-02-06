@@ -2,7 +2,6 @@
 
 #include "../common.h"
 #include <common/src/types.h>
-#include <logger/src/logger.h>
 #include <proto/src/init-message.h>
 #include <proto/src/regular-message.h>
 
@@ -27,7 +26,7 @@ namespace balancer {
                     evutil_socket_t socket,
                     close_op_t close_op,
                     const route_map &route_map,
-                    logger::logger &logger);
+                    log4cplus::Logger &logger);
 
         ~tcp_session() override = default;
 
@@ -83,19 +82,12 @@ namespace balancer {
             }
         }
 
-        template<typename ...args_t>
-        void log_error_and_stop(args_t&& ...args)
-        {
-            logger_.error(std::forward<args_t>(args)...);
-            stop();
-        }
-
     private:
         const close_op_t close_op_;
         const route_map &route_map_;
         common::bufferevent_ptr client_buffer_;
         common::bufferevent_ptr server_buffer_;
-        logger::logger &logger_;
+        log4cplus::Logger &logger_;
     };
 
 }

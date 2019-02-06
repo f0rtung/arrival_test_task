@@ -1,11 +1,14 @@
 #include "tcp-server.h"
 #include <common/src/utils.h>
 
+#include <log4cplus/loggingmacros.h>
+
 namespace balancer {
 
     tcp_server::tcp_server(std::uint16_t port, const route_map &route_map)
         : port_{port}
         , route_map_{route_map}
+        , logger_{common::make_logger("tcp_server")}
     { }
 
     void tcp_server::start()
@@ -29,7 +32,7 @@ namespace balancer {
                     );
         check_null(listener_, "Can not create new listener");
 
-        logger_.info("Start server");
+        LOG4CPLUS_INFO(logger_, "Start server");
         check_result_code(event_base_dispatch(eb_.get()), "Can not run event loop");
     }
 
@@ -52,7 +55,7 @@ namespace balancer {
 
     void tcp_server::start_accept(evutil_socket_t socket, const std::string &client_addr)
     {
-        logger_.info("New client connection was accepted, client address: ", client_addr);
+        LOG4CPLUS_INFO(logger_, "New client connection was accepted, client address: " << client_addr);
         const auto session_it{sessions_.emplace(sessions_.end())};
         const auto close_op{[this, session_it]() { sessions_.erase(session_it); }};
         *session_it = std::make_unique<tcp_session>(eb_.get(), socket, close_op, route_map_, logger_);
@@ -68,7 +71,7 @@ namespace balancer {
 
     void tcp_server::log_error_stop_and_throw (const std::string &error_msg)
     {
-        logger_.error(error_msg);
+        LOG4CPLUS_ERROR(logger_, error_msg);
         stop();
         throw std::runtime_error{error_msg};
     }

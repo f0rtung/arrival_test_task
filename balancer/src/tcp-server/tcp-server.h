@@ -2,7 +2,6 @@
 
 #include "../common.h"
 #include <common/src/types.h>
-#include <logger/src/logger.h>
 #include "../tcp-session/tcp-session.h"
 
 #include <list>
@@ -32,9 +31,9 @@ namespace balancer {
     private:
         const std::uint16_t port_;
         const route_map route_map_;
+        log4cplus::Logger logger_;
         common::event_base_ptr eb_;
         common::listener_ptr listener_;
-        logger::logger logger_{"tcp_server"};
         std::list<std::unique_ptr<session_iface>> sessions_;
     };
 

@@ -15,7 +15,6 @@ set(EXECUTABLE_OUTPUT_PATH ${OUTPUT_PATH})
 
 link_directories(
     ./../proto/lib/
-    ./../logger/lib/
     ./../common/lib/
 )
 
@@ -40,6 +39,5 @@ target_link_libraries(
     event
     log4cplus
     Proto
-    Logger
     Common
 )

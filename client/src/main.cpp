@@ -1,4 +1,3 @@
-#include <logger/src/logger.h>
 #include "./tcp-client/tcp-client.h"
 
 #include <signal.h>

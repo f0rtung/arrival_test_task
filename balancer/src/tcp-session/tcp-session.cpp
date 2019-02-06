@@ -1,12 +1,14 @@
 #include "tcp-session.h"
 
+#include <log4cplus/loggingmacros.h>
+
 namespace balancer {
 
     tcp_session::tcp_session(event_base *base,
                              evutil_socket_t socket,
                              close_op_t close_op,
                              const route_map &route_map,
-                             logger::logger &logger)
+                             log4cplus::Logger &logger)
         : close_op_{std::move(close_op)}
         , route_map_{route_map}
         , client_buffer_{common::bufferevent_ptr(bufferevent_socket_new(base, socket, BEV_OPT_CLOSE_ON_FREE))}
@@ -17,12 +19,14 @@ namespace balancer {
     {
         try {
             check_null(client_buffer_, "Invalid client bufferevent");
-            logger_.info("Start new unknown session");
+            LOG4CPLUS_INFO(logger_, "Start new unknown session");
             start_reading_init_message();
         } catch (const std::exception &ex) {
-            log_error_and_stop("Can not start session with error: ", ex.what());
+            LOG4CPLUS_ERROR(logger_, "Can not start session with error: " << ex.what());
+            stop();
         } catch (...) {
-            log_error_and_stop("Can not start session with unknown error");
+            LOG4CPLUS_ERROR(logger_, "Can not start session with unknown error");
+            stop();
         }
     }
 
@@ -52,11 +56,12 @@ namespace balancer {
     {
         const auto msg{read_message<proto::init_message>()};
         if(msg.type() == proto::message_type::init) {
-            logger_.info("We connected with client: ", msg.client_id());
+            LOG4CPLUS_INFO(logger_, "We connected with client: " << msg.client_id());
             start_routing(msg.client_id());
         } else {
             const auto type_uint{static_cast<std::uint32_t>(msg.type())};
-            log_error_and_stop("Invalid init message, type is ", type_uint);
+            LOG4CPLUS_ERROR(logger_, "Invalid init message, type is " << type_uint);
+            stop();
         }
     }
 
@@ -67,15 +72,19 @@ namespace balancer {
             try {
                 auto &srv{server_it->second};
                 connect_to_server(srv);
-                logger_.info("Start routing packets from clietn ", client_id, " to server ", srv);
+                LOG4CPLUS_INFO(logger_, "Start routing packets from clietn "
+                               << client_id << " to server " << srv);
                 start_reading_regular_message();
             } catch (const std::exception &ex) {
-                log_error_and_stop("Can not start routing, error: ", ex.what());
+                LOG4CPLUS_ERROR(logger_, "Can not start routing, error: " << ex.what());
+                stop();
             } catch (...) {
-                log_error_and_stop("Can not start routing with unknown error");
+                LOG4CPLUS_ERROR(logger_, "Can not start routing with unknown error");
+                stop();
             }
         } else {
-            log_error_and_stop("Have no information about client: ", client_id);
+            LOG4CPLUS_ERROR(logger_, "Have no information about client: " << client_id);
+            stop();
         }
     }
 
@@ -111,7 +120,7 @@ namespace balancer {
     void tcp_session::read_regular_message()
     {
         const auto msg{read_message<proto::regular_message>()};
-        logger_.info("Message with payload '", msg.payload() ,"' has been received");
+        LOG4CPLUS_INFO(logger_, "Message with payload '" << msg.payload() << "' has been received");
         write_regular_message(msg.as_bytes());
     }
 
@@ -123,7 +132,7 @@ namespace balancer {
     void tcp_session::on_next_event(short what)
     {
         if(what & BEV_EVENT_EOF || what & BEV_EVENT_ERROR) {
-            logger_.info("Close session");
+            LOG4CPLUS_INFO(logger_, "Close session");
             stop();
         }
     }
