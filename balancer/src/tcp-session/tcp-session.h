@@ -165,7 +165,7 @@ namespace balancer {
         {
             proto::bytes bytes(msg_t::message_length());
             bufferevent_read(client_buffer_.get(), bytes.data(), bytes.size());
-            msg_t msg{bytes};
+            msg_t msg{std::move(bytes)};
             msg.load();
             return msg;
         }
