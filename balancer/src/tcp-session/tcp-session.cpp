@@ -23,10 +23,10 @@ namespace balancer {
             start_reading_init_message();
         } catch (const std::exception &ex) {
             LOG4CPLUS_ERROR(logger_, "Can not start session with error: " << ex.what());
-            stop();
+            drop_session();
         } catch (...) {
             LOG4CPLUS_ERROR(logger_, "Can not start session with unknown error");
-            stop();
+            drop_session();
         }
     }
 
@@ -40,6 +40,11 @@ namespace balancer {
             bufferevent_disable(server_buffer_.get(), EV_WRITE);
             server_buffer_.reset();
         }
+    }
+
+    void tcp_session::drop_session()
+    {
+        stop();
         close_op_();
     }
 
@@ -61,7 +66,7 @@ namespace balancer {
         } else {
             const auto type_uint{static_cast<std::uint32_t>(msg.type())};
             LOG4CPLUS_ERROR(logger_, "Invalid init message, type is " << type_uint);
-            stop();
+            drop_session();
         }
     }
 
@@ -77,14 +82,14 @@ namespace balancer {
                 start_reading_regular_message();
             } catch (const std::exception &ex) {
                 LOG4CPLUS_ERROR(logger_, "Can not start routing, error: " << ex.what());
-                stop();
+                drop_session();
             } catch (...) {
                 LOG4CPLUS_ERROR(logger_, "Can not start routing with unknown error");
-                stop();
+                drop_session();
             }
         } else {
             LOG4CPLUS_ERROR(logger_, "Have no information about client: " << client_id);
-            stop();
+            drop_session();
         }
     }
 
@@ -133,7 +138,7 @@ namespace balancer {
     {
         if(what & BEV_EVENT_EOF || what & BEV_EVENT_ERROR) {
             LOG4CPLUS_INFO(logger_, "Close session");
-            stop();
+            drop_session();
         }
     }
 

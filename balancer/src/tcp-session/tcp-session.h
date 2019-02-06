@@ -35,6 +35,7 @@ namespace balancer {
         void stop() override;
 
     private:
+        void drop_session();
         void start_reading_init_message();
         void read_init_message();
         void start_routing(proto::init_message::client_id_t client_id);
