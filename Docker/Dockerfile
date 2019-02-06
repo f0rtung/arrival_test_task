@@ -25,7 +25,6 @@ RUN \
 	cd /project/arrival_test_task && \
 	cd common && cmake . && make && cd .. && \
 	cd proto && cmake . && make && ./lib/ProtoTests && cd .. && \
-	cd logger && cmake . && make && cd .. && \
 	cd client && cmake . && make && cd .. && \
 	cd balancer && cmake . && make
 
