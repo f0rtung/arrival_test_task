@@ -21,7 +21,7 @@ RUN \
 # Build projects
 RUN \
     mkdir project && cd project && \
-    git clone https://github.com/f0rtung/arrival_test_task.git && \
+    git clone --without_corrections https://github.com/f0rtung/arrival_test_task.git && \
     cd /project/arrival_test_task && \
     cd common && cmake . && make && cd .. && \
     cd proto && cmake . && make && ./lib/ProtoTests && cd .. && \
