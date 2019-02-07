@@ -69,7 +69,6 @@ namespace balancer {
                                                  start_write_pos,
                                                  expected_read);
             }
-            bufferevent_read(client_buffer_.get(), bytes.data(), bytes.size());
             msg_t msg{std::move(bytes)};
             msg.load();
             return msg;
